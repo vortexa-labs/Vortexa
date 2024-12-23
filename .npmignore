@@ -1,0 +1,27 @@
+# Source
+src/
+examples/
+tests/
+
+# Config files
+.eslintrc.js
+.prettierrc
+.prettierignore
+tsconfig.json
+.env*
+.vscode/
+.github/
+
+# Development files
+*.log
+*.tsbuildinfo
+coverage/
+.nyc_output/
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Git
+.git/
+.gitignore 
