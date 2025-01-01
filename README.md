@@ -111,7 +111,7 @@ npm install @openserv-labs/sdk
 
 1. **Log In to the Platform**
 
-   - Visit [OpenServ Platform](https://openserv.ai) and log in using your Google account
+   - Visit [OpenServ Platform](https://platform.openserv.ai) and log in using your Google account
    - This gives you access to developer tools and features
 
 2. **Set Up Developer Account**
