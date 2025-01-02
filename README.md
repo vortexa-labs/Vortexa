@@ -152,12 +152,22 @@ npm install @openserv-labs/sdk
 
    ```typescript
    import { Agent } from '@openserv-labs/sdk'
+   import { z } from 'zod'
 
    const agent = new Agent({
-     systemPrompt: 'You are a specialized agent that...',
-     capabilities: [
-       // Define your agent's capabilities
-     ]
+     systemPrompt: 'You are a specialized agent that...'
+   })
+
+   // Add capabilities using the addCapability method
+   agent.addCapability({
+     name: 'greet',
+     description: 'Greet a user by name',
+     schema: z.object({
+       name: z.string().describe('The name of the user to greet')
+     }),
+     async run({ args }) {
+       return `Hello, ${args.name}! How can I help you today?`
+     }
    })
 
    // Start the agent server
