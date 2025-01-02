@@ -242,10 +242,38 @@ agent.start()
 | Variable           | Description                           | Required | Default |
 | ------------------ | ------------------------------------- | -------- | ------- |
 | `OPENSERV_API_KEY` | Your OpenServ API key                 | Yes      | -       |
-| `OPENAI_API_KEY`   | OpenAI API key (for process() method) | No\*     | -       |
+| `OPENAI_API_KEY`   | OpenAI API key (for process() method) | No       | -       |
+| `OPENAI_MODEL`     | OpenAI model to use                   | No       | gpt-4o  |
 | `PORT`             | Server port                           | No       | 7378    |
 
 \*Required if using OpenAI integration features
+
+For a complete list of available models and their capabilities, please refer to [OpenAI's Models Overview](https://platform.openai.com/docs/models).
+
+Supported models:
+
+```typescript
+// GPT-4 Opus Models
+'gpt-4o-2024-11-20'
+'gpt-4o-2024-08-06'
+'gpt-4o-2024-05-13'
+
+// GPT-4 Models
+'gpt-4-0125-preview'
+'gpt-4-turbo-preview'
+'gpt-4-1106-preview'
+'gpt-4'
+'gpt-4-0613'
+
+// GPT-3.5 Models
+'gpt-3.5-turbo-0125'
+'gpt-3.5-turbo'
+'gpt-3.5-turbo-1106'
+'gpt-3.5-turbo-instruct'
+
+// Legacy Models
+'gpt-4o'
+```
 
 ## Core Concepts
 
