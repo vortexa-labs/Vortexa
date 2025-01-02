@@ -567,22 +567,26 @@ export class Agent {
           const parsedArgs = JSON.parse(args)
 
           try {
-            // Call the corresponding method on this class with named parameters
-            const result = await (this as any)[name](parsedArgs)
+            // Find the tool in our tools array
+            const tool = this.tools.find(t => t.name === name)
+            if (!tool) {
+              throw new Error(`Tool "${name}" not found`)
+            }
+
+            // Call the tool's run method with the parsed arguments and bind this
+            const result = await tool.run.bind(this)({ args: parsedArgs }, currentMessages)
             return {
-              tool_call_id: toolCall.id,
               role: 'tool' as const,
-              name,
-              content: JSON.stringify(result)
+              content: JSON.stringify(result),
+              tool_call_id: toolCall.id
             }
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
             logger.error({ error, toolCall }, 'Error executing tool call')
             return {
-              tool_call_id: toolCall.id,
               role: 'tool' as const,
-              name,
-              content: JSON.stringify({ error: errorMessage })
+              content: JSON.stringify({ error: errorMessage }),
+              tool_call_id: toolCall.id
             }
           }
         })
