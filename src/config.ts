@@ -23,23 +23,19 @@ export const envSchema = z.object({
     .min(1, 'OpenServ API key cannot be empty'),
   OPENAI_MODEL: z
     .enum([
-      // GPT-4 Opus Models
-      'gpt-4o-2024-11-20',
+      'gpt-4o',
       'gpt-4o-2024-08-06',
       'gpt-4o-2024-05-13',
-      // GPT-4 Models
-      'gpt-4-0125-preview',
+      'gpt-4o-mini',
+      'gpt-4o-mini-2024-07-18',
+      'gpt-4-turbo',
+      'gpt-4-turbo-2024-04-09',
       'gpt-4-turbo-preview',
+      'gpt-4-0125-preview',
       'gpt-4-1106-preview',
-      'gpt-4',
-      'gpt-4-0613',
-      // GPT-3.5 Models
-      'gpt-3.5-turbo-0125',
       'gpt-3.5-turbo',
-      'gpt-3.5-turbo-1106',
-      'gpt-3.5-turbo-instruct',
-      // Legacy Models
-      'gpt-4o'
+      'gpt-3.5-turbo-0125',
+      'gpt-3.5-turbo-1106'
     ])
     .default('gpt-4o'),
   OPENSERV_API_URL: z.string().default('https://api.openserv.ai'),
