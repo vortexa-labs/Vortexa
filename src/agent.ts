@@ -689,6 +689,7 @@ export class Agent {
    * @param {Object} req.body - Request body
    * @param {z.infer<z.ZodTypeAny>} [req.body.args] - Arguments for the tool
    * @param {z.infer<typeof actionSchema>} [req.body.action] - Action context
+   * @param {ChatCompletionMessageParam[]} [req.body.messages] - Message history
    * @returns {Promise<{result: string}>} The result of the tool execution
    * @throws {BadRequest} If tool name is missing or tool is not found
    * @throws {Error} If tool execution fails
@@ -698,6 +699,7 @@ export class Agent {
     body: {
       args?: z.infer<z.ZodTypeAny>
       action?: z.infer<typeof actionSchema>
+      messages?: ChatCompletionMessageParam[]
     }
   }) {
     if (!('toolName' in req.params)) {
@@ -711,7 +713,8 @@ export class Agent {
 
     try {
       const args = await tool.schema.parseAsync(req.body?.args)
-      const result = await tool.run.call(this, { args, action: req.body.action }, [])
+      const messages = req.body.messages || []
+      const result = await tool.run.call(this, { args, action: req.body.action }, messages)
       return { result }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
