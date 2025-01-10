@@ -53,14 +53,18 @@ describe('Agent', () => {
       run: async ({ args }) => args.input
     })
 
-    await agent.handleToolRoute({
-      params: { toolName: 'testTool' },
-      body: { args: { input: 123 } }
-    })
-
-    assert.ok(handledError instanceof z.ZodError)
-    assert.ok(handledError.issues[0].message.includes('Expected string, received number'))
-    assert.equal(handledContext?.context, 'handle_tool_route')
+    try {
+      await agent.handleToolRoute({
+        params: { toolName: 'testTool' },
+        body: { args: { input: 123 } }
+      })
+      assert.fail('Expected error to be thrown')
+    } catch (error) {
+      assert.ok(error instanceof z.ZodError)
+      assert.ok(handledError instanceof z.ZodError)
+      assert.ok(handledError.issues[0].message.includes('Expected string, received number'))
+      assert.equal(handledContext?.context, 'handle_tool_route')
+    }
   })
 
   test('should handle tool route with missing tool', async () => {
@@ -76,14 +80,18 @@ describe('Agent', () => {
       }
     })
 
-    await agent.handleToolRoute({
-      params: { toolName: 'nonexistentTool' },
-      body: { args: {} }
-    })
-
-    assert.ok(handledError instanceof BadRequestError)
-    assert.equal(handledError.message, 'Tool "nonexistentTool" not found')
-    assert.equal(handledContext?.context, 'handle_tool_route')
+    try {
+      await agent.handleToolRoute({
+        params: { toolName: 'nonexistentTool' },
+        body: { args: {} }
+      })
+      assert.fail('Expected error to be thrown')
+    } catch (error) {
+      assert.ok(error instanceof BadRequestError)
+      assert.ok(handledError instanceof BadRequestError)
+      assert.equal(handledError.message, 'Tool "nonexistentTool" not found')
+      assert.equal(handledContext?.context, 'handle_tool_route')
+    }
   })
 
   test('should handle process request', async () => {

@@ -4,6 +4,7 @@ import { Agent } from '../src/agent'
 import type OpenAI from 'openai'
 import type { doTaskActionSchema, respondChatMessageActionSchema } from '../src/types'
 import type { z } from 'zod'
+import { BadRequest as BadRequestError } from 'http-errors'
 
 // Create a test class that exposes protected methods for testing
 class TestAgent extends Agent {
@@ -116,13 +117,17 @@ describe('Agent API Methods', () => {
       }
     })
 
-    await agent.handleToolRoute({
-      params: { toolName: 'nonexistent' },
-      body: {}
-    })
-
-    assert.ok(handledError instanceof Error)
-    assert.equal(handledContext?.context, 'handle_tool_route')
+    try {
+      await agent.handleToolRoute({
+        params: { toolName: 'nonexistent' },
+        body: {}
+      })
+      assert.fail('Expected error to be thrown')
+    } catch (error) {
+      assert.ok(error instanceof BadRequestError)
+      assert.ok(handledError instanceof Error)
+      assert.equal(handledContext?.context, 'handle_tool_route')
+    }
   })
 
   test('should handle errors in process method', async () => {
