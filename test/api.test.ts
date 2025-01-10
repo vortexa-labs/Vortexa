@@ -30,9 +30,9 @@ describe('Agent API Methods', () => {
       'addCapabilities'
     ]
 
-    requiredMethods.forEach(method => {
+    for (const method of requiredMethods) {
       assert.ok(typeof agent[method] === 'function', `${method} should be a function`)
-    })
+    }
   })
 
   test('should make process method available when openaiApiKey is provided', () => {
@@ -46,18 +46,34 @@ describe('Agent API Methods', () => {
   })
 
   test('should throw error when process is called without OpenAI API key', async () => {
+    // Save original env var
+    const originalApiKey = process.env.OPENAI_API_KEY
+    // Clear env var for test
+    // Using delete here despite the linter warning because it's the only way to properly remove an environment variable
+    // The performance impact is not a concern in tests
+
+    // biome-ignore lint/performance/noDelete: This is a test, fgs.
+    delete process.env.OPENAI_API_KEY
+
     const agent = new Agent({
       apiKey: mockApiKey,
       systemPrompt: 'You are a test agent'
     })
 
-    await assert.rejects(
-      () => agent.process({ messages: [{ role: 'user', content: 'test message' }] }),
-      {
-        message:
-          'OpenAI API key is required for process(). Please provide it in options or set OPENAI_API_KEY environment variable.'
+    try {
+      await assert.rejects(
+        () => agent.process({ messages: [{ role: 'user', content: 'test message' }] }),
+        {
+          message:
+            'OpenAI API key is required for process(). Please provide it in options or set OPENAI_API_KEY environment variable.'
+        }
+      )
+    } finally {
+      // Restore original env var
+      if (originalApiKey !== undefined) {
+        process.env.OPENAI_API_KEY = originalApiKey
       }
-    )
+    }
   })
 
   test('should have start method available', () => {

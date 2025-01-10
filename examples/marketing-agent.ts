@@ -2,8 +2,8 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import { Agent } from '../src'
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import { z } from 'zod'
 import OpenAI from 'openai'
 import { logger } from '../src/logger'

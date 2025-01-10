@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance } from 'axios'
+import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import compression from 'compression'
 import express from 'express'
 import type { AsyncRouterInstance } from 'express-async-router'
@@ -6,7 +6,7 @@ import { AsyncRouter } from 'express-async-router'
 import helmet from 'helmet'
 import hpp from 'hpp'
 import { logger } from './logger'
-import http from 'http'
+import type http from 'node:http'
 import type {
   GetFilesParams,
   UploadFileParams,
@@ -22,7 +22,8 @@ import type {
   UpdateTaskStatusParams,
   ProcessParams
 } from './types'
-import { actionSchema, doTaskActionSchema, respondChatMessageActionSchema } from './types'
+import type { doTaskActionSchema, respondChatMessageActionSchema } from './types'
+import { actionSchema } from './types'
 import { BadRequest } from 'http-errors'
 import type {
   ChatCompletionMessageParam,
@@ -109,7 +110,7 @@ export class Agent {
    * Each capability is an instance of the Capability class with a name, description, schema, and run function.
    * @protected
    */
-  protected tools: Array<Capability<any>> = []
+  protected tools: Array<Capability<z.ZodTypeAny>> = []
 
   /**
    * The OpenServ API key used for authentication.
@@ -259,7 +260,10 @@ export class Agent {
     if (this.tools.some(tool => tool.name === name)) {
       throw new Error(`Tool with name "${name}" already exists`)
     }
-    this.tools.push(new Capability(name, description, schema, run))
+    // Type assertion through unknown for safe conversion between compatible generic types
+    this.tools.push(
+      new Capability(name, description, schema, run) as unknown as Capability<z.ZodTypeAny>
+    )
     return this
   }
 
@@ -287,9 +291,9 @@ export class Agent {
       ) => string | Promise<string>
     }
   }): this {
-    capabilities.forEach(capability => {
+    for (const capability of capabilities) {
       this.addCapability(capability)
-    })
+    }
     return this
   }
 
@@ -654,12 +658,12 @@ export class Agent {
     ]
 
     if (action.messages) {
-      action.messages.forEach((msg: { author: 'agent' | 'user'; message: string }) => {
+      for (const msg of action.messages) {
         messages.push({
           role: msg.author === 'user' ? 'user' : 'assistant',
           content: msg.message
         })
-      })
+      }
     }
 
     try {

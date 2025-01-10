@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import type { z } from 'zod'
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 import type { CapabilityFuncParams } from './types'
 
