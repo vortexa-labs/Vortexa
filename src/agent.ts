@@ -111,6 +111,14 @@ export interface AgentOptions {
    * Required when using the process() method.
    */
   openaiApiKey?: string
+
+  /**
+   * Error handler function for all agent operations.
+   * Defaults to logging the error if not provided.
+   * @param error - The error that occurred
+   * @param context - Additional context about where the error occurred
+   */
+  onError?: (error: Error, context?: Record<string, unknown>) => void
 }
 
 export class Agent {
@@ -590,68 +598,87 @@ export class Agent {
    * @throws {Error} If no response is received from OpenAI or max iterations are reached
    */
   async process({ messages }: ProcessParams): Promise<ChatCompletion> {
-    const currentMessages = [...messages]
-    let completion: ChatCompletion | null = null
-    let iterationCount = 0
-    const MAX_ITERATIONS = 10
-
-    while (iterationCount < MAX_ITERATIONS) {
-      completion = await this.openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: currentMessages,
-        tools: this.openAiTools
-      })
-
-      if (!completion.choices?.length || !completion.choices[0]?.message) {
-        throw new Error('No response from OpenAI')
+    try {
+      const apiKey = this.options.openaiApiKey || process.env.OPENAI_API_KEY
+      if (!apiKey) {
+        throw new Error(
+          'OpenAI API key is required for process(). Please provide it in options or set OPENAI_API_KEY environment variable.'
+        )
       }
 
-      const lastMessage = completion.choices[0].message
+      const currentMessages = [...messages]
+      let completion: ChatCompletion | null = null
+      let iterationCount = 0
+      const MAX_ITERATIONS = 10
 
-      // If there are no tool calls, we're done
-      if (!lastMessage.tool_calls?.length) {
-        return completion
-      }
-
-      // Process each tool call
-      const toolResults = await Promise.all(
-        lastMessage.tool_calls.map(async toolCall => {
-          // We know the function exists because we provided the tools
-          const { name, arguments: args } = toolCall.function!
-          const parsedArgs = JSON.parse(args)
-
-          try {
-            // Find the tool in our tools array
-            const tool = this.tools.find(t => t.name === name)
-            if (!tool) {
-              throw new Error(`Tool "${name}" not found`)
-            }
-
-            // Call the tool's run method with the parsed arguments and bind this
-            const result = await tool.run.bind(this)({ args: parsedArgs }, currentMessages)
-            return {
-              role: 'tool' as const,
-              content: JSON.stringify(result),
-              tool_call_id: toolCall.id
-            }
-          } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-            logger.error({ error, toolCall }, 'Error executing tool call')
-            return {
-              role: 'tool' as const,
-              content: JSON.stringify({ error: errorMessage }),
-              tool_call_id: toolCall.id
-            }
-          }
+      while (iterationCount < MAX_ITERATIONS) {
+        completion = await this.openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: currentMessages,
+          tools: this.tools.length ? this.openAiTools : undefined
         })
-      )
 
-      // Add the assistant's message and tool results to the conversation
-      currentMessages.push(lastMessage, ...toolResults)
-      iterationCount++
+        if (!completion.choices?.length || !completion.choices[0]?.message) {
+          throw new Error('No response from OpenAI')
+        }
+
+        const lastMessage = completion.choices[0].message
+
+        // If there are no tool calls, we're done
+        if (!lastMessage.tool_calls?.length) {
+          return completion
+        }
+
+        // Process each tool call
+        const toolResults = await Promise.all(
+          lastMessage.tool_calls.map(async toolCall => {
+            if (!toolCall.function) {
+              throw new Error('Tool call function is missing')
+            }
+            const { name, arguments: args } = toolCall.function
+            const parsedArgs = JSON.parse(args)
+
+            try {
+              // Find the tool in our tools array
+              const tool = this.tools.find(t => t.name === name)
+              if (!tool) {
+                throw new Error(`Tool "${name}" not found`)
+              }
+
+              // Call the tool's run method with the parsed arguments and bind this
+              const result = await tool.run.bind(this)({ args: parsedArgs }, currentMessages)
+              return {
+                role: 'tool' as const,
+                content: JSON.stringify(result),
+                tool_call_id: toolCall.id
+              }
+            } catch (error) {
+              const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+              this.handleError(error instanceof Error ? error : new Error(errorMessage), {
+                toolCall,
+                context: 'tool_execution'
+              })
+              return {
+                role: 'tool' as const,
+                content: JSON.stringify({ error: errorMessage }),
+                tool_call_id: toolCall.id
+              }
+            }
+          })
+        )
+
+        // Add the assistant's message and tool results to the conversation
+        currentMessages.push(lastMessage, ...toolResults)
+        iterationCount++
+      }
+
+      throw new Error('Max iterations reached without completion')
+    } catch (error) {
+      this.handleError(error instanceof Error ? error : new Error(String(error)), {
+        context: 'process'
+      })
+      throw error
     }
-
-    throw new Error('Max iterations reached without completion')
   }
 
   /**
@@ -681,16 +708,10 @@ export class Agent {
         action
       })
     } catch (error) {
-      if (action.task) {
-        await this.markTaskAsErrored({
-          workspaceId: action.workspace.id,
-          taskId: action.task.id,
-          error: error instanceof Error ? error.message : 'Unknown error occurred'
-        })
-      }
-
-      logger.error({ error }, 'Failed to forward action to runtime agent')
-      throw error
+      this.handleError(error instanceof Error ? error : new Error(String(error)), {
+        action,
+        context: 'do_task'
+      })
     }
   }
 
@@ -723,14 +744,10 @@ export class Agent {
         action
       })
     } catch (error) {
-      await this.sendChatMessage({
-        workspaceId: action.workspace.id,
-        agentId: action.me.id,
-        message: error instanceof Error ? error.message : 'Unknown error occurred'
+      this.handleError(error instanceof Error ? error : new Error(String(error)), {
+        action,
+        context: 'respond_to_chat'
       })
-
-      logger.error({ error }, 'Failed to forward action to runtime agent')
-      throw error
     }
   }
 
@@ -756,23 +773,25 @@ export class Agent {
       messages?: ChatCompletionMessageParam[]
     }
   }) {
-    if (!('toolName' in req.params)) {
-      throw new BadRequest('Tool name is required')
-    }
-
-    const tool = this.tools.find(t => t.name === req.params.toolName)
-    if (!tool) {
-      throw new BadRequest(`Tool "${req.params.toolName}" not found`)
-    }
-
     try {
+      if (!('toolName' in req.params)) {
+        throw new BadRequest('Tool name is required')
+      }
+
+      const tool = this.tools.find(t => t.name === req.params.toolName)
+      if (!tool) {
+        throw new BadRequest(`Tool "${req.params.toolName}" not found`)
+      }
+
       const args = await tool.schema.parseAsync(req.body?.args)
       const messages = req.body.messages || []
       const result = await tool.run.call(this, { args, action: req.body.action }, messages)
       return { result }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-      throw new Error(errorMessage)
+      this.handleError(error instanceof Error ? error : new Error(String(error)), {
+        request: req,
+        context: 'handle_tool_route'
+      })
     }
   }
 
@@ -785,12 +804,19 @@ export class Agent {
    * @throws {Error} If action type is invalid
    */
   async handleRootRoute(req: { body: unknown }) {
-    const action = await actionSchema.parseAsync(req.body)
-    if (action.type === 'do-task') {
-      this.doTask(action)
-    } else if (action.type === 'respond-chat-message') {
-      this.respondToChat(action)
-    } else throw new Error('Invalid action type')
+    try {
+      const action = await actionSchema.parseAsync(req.body)
+      if (action.type === 'do-task') {
+        this.doTask(action)
+      } else if (action.type === 'respond-chat-message') {
+        this.respondToChat(action)
+      } else throw new Error('Invalid action type')
+    } catch (error) {
+      this.handleError(error instanceof Error ? error : new Error(String(error)), {
+        request: req,
+        context: 'handle_root_route'
+      })
+    }
   }
 
   /**
@@ -848,6 +874,17 @@ export class Agent {
     return new Promise<void>(resolve => {
       this.server?.close(() => resolve())
     })
+  }
+
+  /**
+   * Default error handler that logs the error
+   * @private
+   */
+  private handleError(error: Error, context?: Record<string, unknown>) {
+    const handler =
+      this.options.onError ??
+      ((err, ctx) => logger.error({ error: err, ...ctx }, 'Error in agent operation'))
+    handler(error, context)
   }
 }
 
