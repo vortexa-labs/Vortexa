@@ -742,7 +742,8 @@ export class Agent {
         request: req,
         context: 'handle_tool_route'
       })
-      return { error: error instanceof Error ? error.message : String(error) }
+
+      throw error
     }
   }
 
