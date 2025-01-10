@@ -1,14 +1,9 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
 import { Agent } from '../src/agent'
-import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import type OpenAI from 'openai'
 import type { doTaskActionSchema, respondChatMessageActionSchema } from '../src/types'
 import type { z } from 'zod'
-
-interface RetryConfig extends InternalAxiosRequestConfig {
-  _retryCount?: number
-}
 
 // Create a test class that exposes protected methods for testing
 class TestAgent extends Agent {
@@ -23,34 +18,6 @@ class TestAgent extends Agent {
   public set testOpenAI(client: OpenAI) {
     this._openai = client
   }
-}
-
-// Create our own retry interceptor for testing since we can't import the internal one
-function createTestRetryInterceptor(
-  client: AxiosInstance,
-  maxRetries = 3,
-  retryDelay = 1000
-): void {
-  client.interceptors.request.use((config: RetryConfig) => {
-    if (typeof config._retryCount === 'undefined') {
-      config._retryCount = 0
-    }
-    return config
-  })
-
-  client.interceptors.response.use(
-    response => response,
-    async error => {
-      const config = error.config as RetryConfig
-      const currentRetryCount = config._retryCount ?? 0
-      if (error.response?.status === 502 && currentRetryCount < maxRetries) {
-        config._retryCount = currentRetryCount + 1
-        await new Promise(resolve => setTimeout(resolve, retryDelay))
-        return client(config)
-      }
-      return Promise.reject(error)
-    }
-  )
 }
 
 describe('Agent API Methods', () => {
@@ -156,29 +123,6 @@ describe('Agent API Methods', () => {
 
     assert.ok(handledError instanceof Error)
     assert.equal(handledContext?.context, 'handle_tool_route')
-  })
-
-  test('should retry on 502 errors', async () => {
-    let attempts = 0
-    const mockAxios = axios.create()
-    createTestRetryInterceptor(mockAxios)
-
-    // Mock a request that fails with 502 twice then succeeds
-    mockAxios.interceptors.request.use(config => {
-      attempts++
-      if (attempts < 3) {
-        throw { response: { status: 502 }, config }
-      }
-      return config
-    })
-
-    try {
-      await mockAxios.get('/test')
-    } catch (error) {
-      // Ignore error
-    }
-
-    assert.equal(attempts, 3, 'Should have attempted 3 times')
   })
 
   test('should handle errors in process method', async () => {

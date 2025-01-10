@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
+import axios, { type AxiosInstance } from 'axios'
 import compression from 'compression'
 import express from 'express'
 import type { AsyncRouterInstance } from 'express-async-router'
@@ -38,50 +38,6 @@ import { Capability } from './capability'
 const PLATFORM_URL = process.env.OPENSERV_API_URL || 'https://api.openserv.ai'
 const RUNTIME_URL = process.env.OPENSERV_RUNTIME_URL || 'https://agents.openserv.ai'
 const DEFAULT_PORT = Number.parseInt(process.env.PORT || '') || 7378
-
-// Extend axios config type to include retry count
-interface RetryConfig extends InternalAxiosRequestConfig {
-  _retryCount?: number
-}
-
-/**
- * Creates a retry interceptor for handling 502 errors
- * @param client - The axios instance to retry requests for
- * @param maxRetries - Maximum number of retry attempts
- * @param retryDelay - Delay in milliseconds between retries
- */
-function createRetryInterceptor(client: AxiosInstance, maxRetries = 3, retryDelay = 1000): void {
-  // Initialize retry count on request only if it doesn't exist
-  client.interceptors.request.use((config: RetryConfig) => {
-    if (typeof config._retryCount === 'undefined') {
-      config._retryCount = 0
-    }
-    return config
-  })
-
-  // Handle retries on response
-  client.interceptors.response.use(
-    response => response,
-    async error => {
-      const config = error.config as RetryConfig
-      const currentRetryCount = config._retryCount ?? 0
-      if (error.response?.status === 502 && currentRetryCount < maxRetries) {
-        config._retryCount = currentRetryCount + 1
-        logger.info(
-          {
-            url: config.url,
-            attempt: config._retryCount,
-            maxRetries
-          },
-          'Retrying request due to 502 error'
-        )
-        await new Promise(resolve => setTimeout(resolve, retryDelay))
-        return client(config)
-      }
-      return Promise.reject(error)
-    }
-  )
-}
 
 /**
  * Configuration options for creating a new Agent instance.
@@ -259,9 +215,6 @@ export class Agent {
       }
     })
 
-    // Add retry interceptor for 502 errors
-    createRetryInterceptor(this.apiClient)
-
     // Initialize runtime client
     this.runtimeClient = axios.create({
       baseURL: `${RUNTIME_URL}/runtime`,
@@ -270,9 +223,6 @@ export class Agent {
         'x-openserv-key': this.apiKey
       }
     })
-
-    // Add retry interceptor for 502 errors
-    createRetryInterceptor(this.runtimeClient)
 
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: false }))
