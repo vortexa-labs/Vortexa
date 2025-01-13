@@ -12,6 +12,7 @@ A powerful TypeScript framework for building non-deterministic AI agents with ad
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
   - [Framework Architecture](#framework-architecture)
+    - [Framework \& Blockchain Compatibility](#framework--blockchain-compatibility)
     - [Shadow Agents](#shadow-agents)
     - [Control Levels](#control-levels)
     - [Developer Focus](#developer-focus)
@@ -51,6 +52,8 @@ A powerful TypeScript framework for building non-deterministic AI agents with ad
 - 🤝 Inter-agent collaboration and communication
 - 🔌 Extensible agent architecture with custom capabilities
 - 🔧 Fully autonomous agent runtime with shadow agents
+- 🌐 Framework-agnostic - integrate agents from any AI framework
+- ⛓️ Blockchain-agnostic - compatible with any chain implementation
 - 🤖 Task execution and chat message handling
 - 🔄 Asynchronous task management
 - 📁 File operations and management
@@ -60,6 +63,22 @@ A powerful TypeScript framework for building non-deterministic AI agents with ad
 - 🎯 Three levels of control for different development needs
 
 ## Framework Architecture
+
+### Framework & Blockchain Compatibility
+
+OpenServ is designed to be completely framework and blockchain agnostic, allowing you to:
+
+- Integrate agents built with any AI framework (e.g., LangChain, BabyAGI, Eliza, G.A.M.E, etc.)
+- Connect agents operating on any blockchain network
+- Mix and match different framework agents in the same workspace
+- Maintain full compatibility with your existing agent implementations
+
+This flexibility ensures you can:
+
+- Use your preferred AI frameworks and tools
+- Leverage existing agent implementations
+- Integrate with any blockchain ecosystem
+- Build cross-framework agent collaborations
 
 ### Shadow Agents
 
