@@ -8,6 +8,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "dev:example:marketing-agent": "ts-node-dev --respawn --transpile-only examples/marketing-agent/marketing-agent.ts",
+    "dev:example:goat-agent": "ts-node-dev --respawn --transpile-only examples/goat-agent/goat-agent.ts",
     "dev:example:custom-agent": "ts-node-dev --respawn --transpile-only examples/custom-agent.ts",
     "check-types": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm run lint && npm run check-types && npm run test",
