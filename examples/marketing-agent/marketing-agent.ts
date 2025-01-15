@@ -1,12 +1,12 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-import { Agent } from '../src'
+import { Agent } from '../../src'
 import fs from 'node:fs'
 import path from 'node:path'
 import { z } from 'zod'
 import OpenAI from 'openai'
-import { logger } from '../src/logger'
+import { logger } from '../../src/logger'
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('OPENAI_API_KEY environment variable is required')

@@ -7,8 +7,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "dev:example": "ts-node-dev --respawn --transpile-only examples/marketing-agent.ts",
-    "dev:custom-agent": "ts-node-dev --respawn --transpile-only examples/custom-agent.ts",
+    "dev:example:marketing-agent": "ts-node-dev --respawn --transpile-only examples/marketing-agent/marketing-agent.ts",
+    "dev:example:custom-agent": "ts-node-dev --respawn --transpile-only examples/custom-agent.ts",
     "check-types": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm run lint && npm run check-types && npm run test",
     "prepare": "npm run build",
