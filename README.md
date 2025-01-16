@@ -39,6 +39,8 @@ A powerful TypeScript framework for building non-deterministic AI agents with ad
     - [Workspace Management](#workspace-management)
       - [Get Files](#get-files)
       - [Upload File](#upload-file)
+    - [Integration Management](#integration-management)
+      - [Call Integration](#call-integration)
   - [Advanced Usage](#advanced-usage)
     - [OpenAI Process Runtime](#openai-process-runtime)
     - [Error Handling](#error-handling)
@@ -514,6 +516,52 @@ await agent.uploadFile({
   file: Buffer | string,
   skipSummarizer?: boolean,
   taskIds?: number[]
+})
+```
+
+### Integration Management
+
+#### Call Integration
+
+```typescript
+const response = await agent.callIntegration({
+  workspaceId: number,
+  integrationId: string,
+  details: {
+    endpoint: string,
+    method: string,
+    data?: object
+  }
+})
+```
+
+Allows agents to interact with external services and APIs that are integrated with OpenServ. This method provides a secure way to make API calls to configured integrations within a workspace. Authentication is handled securely and automatically through the OpenServ platform. This is primarily useful for calling external APIs in a deterministic way.
+
+**Parameters:**
+
+- `workspaceId`: ID of the workspace where the integration is configured
+- `integrationId`: ID of the integration to call (e.g., 'twitter-v2', 'github')
+- `details`: Object containing:
+  - `endpoint`: The endpoint to call on the integration
+  - `method`: HTTP method (GET, POST, etc.)
+  - `data`: Optional payload for the request
+
+**Returns:** The response from the integration endpoint
+
+**Example:**
+
+```typescript
+// Example: Sending a tweet using Twitter integration
+const response = await agent.callIntegration({
+  workspaceId: 123,
+  integrationId: 'twitter-v2',
+  details: {
+    endpoint: '/2/tweets',
+    method: 'POST',
+    data: {
+      text: 'Hello from my AI agent!'
+    }
+  }
 })
 ```
 

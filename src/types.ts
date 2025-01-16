@@ -284,3 +284,24 @@ export interface UpdateTaskStatusParams {
 export interface ProcessParams {
   messages: ChatCompletionMessageParam[]
 }
+
+export interface ProxyConfiguration {
+  endpoint: string
+  providerConfigKey?: string
+  connectionId?: string
+  method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE' | 'get' | 'post' | 'patch' | 'put' | 'delete'
+  headers?: Record<string, string>
+  params?: string | Record<string, string | number>
+  data?: unknown
+  retries?: number
+  baseUrlOverride?: string
+  decompress?: boolean
+  responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
+  retryOn?: number[] | null
+}
+
+export interface IntegrationCallRequest {
+  workspaceId: number
+  integrationId: string
+  details: ProxyConfiguration
+}

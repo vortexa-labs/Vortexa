@@ -20,7 +20,8 @@ import type {
   AddLogToTaskParams,
   RequestHumanAssistanceParams,
   UpdateTaskStatusParams,
-  ProcessParams
+  ProcessParams,
+  IntegrationCallRequest
 } from './types'
 import type { doTaskActionSchema, respondChatMessageActionSchema } from './types'
 import { actionSchema } from './types'
@@ -839,6 +840,29 @@ export class Agent {
       this.options.onError ??
       ((err, ctx) => logger.error({ error: err, ...ctx }, 'Error in agent operation'))
     handler(error, context)
+  }
+
+  /**
+   * Calls an integration endpoint through the OpenServ platform.
+   * This method allows agents to interact with external services and APIs that are integrated with OpenServ.
+   *
+   * @param {IntegrationCallRequest} integration - The integration request parameters
+   * @param {number} integration.workspaceId - ID of the workspace where the integration is configured
+   * @param {string} integration.integrationId - ID of the integration to call
+   * @param {Object} integration.details - Details of the integration call
+   * @param {string} integration.details.endpoint - The endpoint to call on the integration
+   * @param {string} integration.details.method - The HTTP method to use (GET, POST, etc.)
+   * @param {Object} [integration.details.data] - Optional data payload for the request
+   * @returns {Promise<any>} The response from the integration endpoint
+   * @throws {Error} If the integration call fails
+   */
+  async callIntegration(integration: IntegrationCallRequest) {
+    const response = await this.apiClient.post(
+      `/workspaces/${integration.workspaceId}/integration/${integration.integrationId}/proxy`,
+      integration.details
+    )
+
+    return response.data
   }
 }
 

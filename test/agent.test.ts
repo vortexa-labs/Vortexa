@@ -954,3 +954,126 @@ describe('Agent Route Setup', () => {
     assert.strictEqual(openAiTools[0].function.description, 'A test tool')
   })
 })
+
+describe('Agent Integration Operations', () => {
+  test('should call integration endpoint successfully', async () => {
+    const agent = new Agent({
+      apiKey: mockApiKey,
+      systemPrompt: 'You are a test agent'
+    })
+
+    const mockResponse = {
+      data: {
+        output: {
+          data: {
+            text: 'Hello from integration!'
+          }
+        }
+      }
+    }
+
+    // Mock the API client
+    Object.defineProperty(agent, 'apiClient', {
+      value: {
+        post: async (url: string, data: unknown) => {
+          assert.strictEqual(url, '/workspaces/1/integration/test-integration/proxy')
+          assert.deepStrictEqual(data, {
+            endpoint: '/test',
+            method: 'POST',
+            data: { message: 'test' }
+          })
+          return mockResponse
+        }
+      },
+      writable: true
+    })
+
+    const response = await agent.callIntegration({
+      workspaceId: 1,
+      integrationId: 'test-integration',
+      details: {
+        endpoint: '/test',
+        method: 'POST',
+        data: { message: 'test' }
+      }
+    })
+
+    assert.deepStrictEqual(response, mockResponse.data)
+  })
+
+  test('should handle integration call without data payload', async () => {
+    const agent = new Agent({
+      apiKey: mockApiKey,
+      systemPrompt: 'You are a test agent'
+    })
+
+    const mockResponse = {
+      data: {
+        output: {
+          data: {
+            status: 'success'
+          }
+        }
+      }
+    }
+
+    // Mock the API client
+    Object.defineProperty(agent, 'apiClient', {
+      value: {
+        post: async (url: string, data: unknown) => {
+          assert.strictEqual(url, '/workspaces/1/integration/test-integration/proxy')
+          assert.deepStrictEqual(data, {
+            endpoint: '/test',
+            method: 'GET'
+          })
+          return mockResponse
+        }
+      },
+      writable: true
+    })
+
+    const response = await agent.callIntegration({
+      workspaceId: 1,
+      integrationId: 'test-integration',
+      details: {
+        endpoint: '/test',
+        method: 'GET'
+      }
+    })
+
+    assert.deepStrictEqual(response, mockResponse.data)
+  })
+
+  test('should handle integration call errors', async () => {
+    const agent = new Agent({
+      apiKey: mockApiKey,
+      systemPrompt: 'You are a test agent'
+    })
+
+    const mockError = new Error('Integration error')
+
+    // Mock the API client
+    Object.defineProperty(agent, 'apiClient', {
+      value: {
+        post: async () => {
+          throw mockError
+        }
+      },
+      writable: true
+    })
+
+    try {
+      await agent.callIntegration({
+        workspaceId: 1,
+        integrationId: 'test-integration',
+        details: {
+          endpoint: '/test',
+          method: 'GET'
+        }
+      })
+      assert.fail('Expected error to be thrown')
+    } catch (error) {
+      assert.strictEqual(error, mockError)
+    }
+  })
+})
