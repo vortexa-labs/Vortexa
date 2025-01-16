@@ -260,6 +260,7 @@ export class Agent {
     description: string
     schema: S
     run(
+      this: Agent,
       params: { args: z.infer<S>; action?: z.infer<typeof actionSchema> },
       messages: ChatCompletionMessageParam[]
     ): string | Promise<string>
@@ -293,10 +294,11 @@ export class Agent {
       name: string
       description: string
       schema: T[K]
-      run: (
+      run(
+        this: Agent,
         params: { args: z.infer<T[K]>; action?: z.infer<typeof actionSchema> },
         messages: ChatCompletionMessageParam[]
-      ) => string | Promise<string>
+      ): string | Promise<string>
     }
   }): this {
     for (const capability of capabilities) {
