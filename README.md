@@ -1,4 +1,4 @@
-# OpenServ Autonomous AI Agent Development Framework
+# OpenServ TypeScript SDK, Autonomous AI Agent Development Framework
 
 [![npm version](https://badge.fury.io/js/@openserv-labs%2Fsdk.svg)](https://www.npmjs.com/package/@openserv-labs/sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
