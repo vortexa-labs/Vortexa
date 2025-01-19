@@ -22,7 +22,7 @@ class TestAgent extends Agent {
 }
 
 describe('Agent API Methods', () => {
-  const mockApiKey = 'test-openserv-key'
+  const mockApiKey = 'test-vortexa-key'
 
   test('should have all required API methods', () => {
     const agent = new Agent({
