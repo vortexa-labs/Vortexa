@@ -1,4 +1,4 @@
-name: Sync README to openserv-docs
+name: Sync README to vortexa-docs
 
 on:
   push:
@@ -14,19 +14,19 @@ jobs:
       - name: Checkout sdk repository
         uses: actions/checkout@v2
 
-      - name: Checkout openserv-docs repository
+      - name: Checkout vortexa-docs repository
         uses: actions/checkout@v2
         with:
-          repository: 'openserv-labs/openserv-docs'
+          repository: 'vortexa-labs/vortexa-docs'
           token: ${{ secrets.GH_TOKEN }}
-          path: 'openserv-docs'
+          path: 'vortexa-docs'
 
-      - name: Copy README.md to openserv-docs
+      - name: Copy README.md to vortexa-docs
         run: |
-          cp README.md openserv-docs/packages/sdk/README.md
+          cp README.md vortexa-docs/packages/sdk/README.md
 
       - name: Commit and push if changed
-        working-directory: ./openserv-docs
+        working-directory: ./vortexa-docs
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
