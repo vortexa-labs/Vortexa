@@ -1,14 +1,14 @@
-# OpenServ TypeScript SDK, Autonomous AI Agent Development Framework
+# Vortexa TypeScript SDK, Autonomous AI Agent Development Framework
 
-[![npm version](https://badge.fury.io/js/@openserv-labs%2Fsdk.svg)](https://www.npmjs.com/package/@openserv-labs/sdk)
+[![npm version](https://badge.fury.io/js/@vortexa-labs%2Fsdk.svg)](https://www.npmjs.com/package/@vortexa-labs/sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 
-A powerful TypeScript framework for building non-deterministic AI agents with advanced cognitive capabilities like reasoning, decision-making, and inter-agent collaboration within the OpenServ platform. Built with strong typing, extensible architecture, and a fully autonomous agent runtime.
+A powerful TypeScript framework for building non-deterministic AI agents with advanced cognitive capabilities like reasoning, decision-making, and inter-agent collaboration within the Vortexa platform. Built with strong typing, extensible architecture, and a fully autonomous agent runtime.
 
 ## Table of Contents
 
-- [OpenServ Autonomous AI Agent Development Framework](#openserv-autonomous-ai-agent-development-framework)
+- [Vortexa Autonomous AI Agent Development Framework](#vortexa-autonomous-ai-agent-development-framework)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
   - [Framework Architecture](#framework-architecture)
