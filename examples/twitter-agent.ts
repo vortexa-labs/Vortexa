@@ -12,7 +12,7 @@ if (!process.env.OPENAI_API_KEY) {
 
 const marketingManager = new Agent({
   systemPrompt: fs.readFileSync(path.join(__dirname, './system.md'), 'utf8'),
-  apiKey: process.env.VORTEXA_API_KEY,
+  apiKey: process.env.OPENSERV_API_KEY,
   openaiApiKey: process.env.OPENAI_API_KEY
 })
 
