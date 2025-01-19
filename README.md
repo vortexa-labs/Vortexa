@@ -68,7 +68,7 @@ A powerful TypeScript framework for building non-deterministic AI agents with ad
 
 ### Framework & Blockchain Compatibility
 
-OpenServ is designed to be completely framework and blockchain agnostic, allowing you to:
+Vortexa is designed to be completely framework and blockchain agnostic, allowing you to:
 
 - Integrate agents built with any AI framework (e.g., LangChain, BabyAGI, Eliza, G.A.M.E, etc.)
 - Connect agents operating on any blockchain network
@@ -93,12 +93,12 @@ This ensures smarter and more reliable agent performance without additional deve
 
 ### Control Levels
 
-OpenServ offers three levels of control to match your development needs:
+Vortexa offers three levels of control to match your development needs:
 
 1. **Fully Autonomous (Level 1)**
 
    - Only build your agent's capabilities
-   - OpenServ's "second brain" handles everything else
+   - Vortexa's "second brain" handles everything else
    - Built-in shadow agents manage decision-making and validation
    - Perfect for rapid development
 
@@ -123,7 +123,7 @@ The framework caters to two types of developers:
 ## Installation
 
 ```bash
-npm install @openserv-labs/sdk
+npm install @vortexa-labs/sdk
 ```
 
 ## Getting Started
@@ -132,7 +132,7 @@ npm install @openserv-labs/sdk
 
 1. **Log In to the Platform**
 
-   - Visit [OpenServ Platform](https://platform.openserv.ai) and log in using your Google account
+   - Visit [Vortexa Platform](https://platform.vortexa.xyz) and log in using your Google account
    - This gives you access to developer tools and features
 
 2. **Set Up Developer Account**
@@ -162,7 +162,7 @@ npm install @openserv-labs/sdk
 
    ```bash
    # Required
-   export OPENSERV_API_KEY=your_api_key_here
+   export VORTEXA_API_KEY=your_api_key_here
 
    # Optional
    export OPENAI_API_KEY=your_openai_key_here  # If using OpenAI process runtime
@@ -172,7 +172,7 @@ npm install @openserv-labs/sdk
 2. **Initialize Your Agent**
 
    ```typescript
-   import { Agent } from '@openserv-labs/sdk'
+   import { Agent } from '@vortexa-labs/sdk'
    import { z } from 'zod'
 
    const agent = new Agent({
@@ -211,13 +211,13 @@ npm install @openserv-labs/sdk
 Create a simple agent with a greeting capability:
 
 ```typescript
-import { Agent } from '@openserv-labs/sdk'
+import { Agent } from '@vortexa-labs/sdk'
 import { z } from 'zod'
 
 // Initialize the agent
 const agent = new Agent({
   systemPrompt: 'You are a helpful assistant.',
-  apiKey: process.env.OPENSERV_API_KEY
+  apiKey: process.env.VORTEXA_API_KEY
 })
 
 // Add a capability
@@ -262,7 +262,7 @@ agent.start()
 
 | Variable           | Description                           | Required | Default |
 | ------------------ | ------------------------------------- | -------- | ------- |
-| `OPENSERV_API_KEY` | Your OpenServ API key                 | Yes      | -       |
+| `VORTEXA_API_KEY` | Your Vortexa API key                 | Yes      | -       |
 | `OPENAI_API_KEY`   | OpenAI API key (for process() method) | No\*     | -       |
 | `PORT`             | Server port                           | No       | 7378    |
 
@@ -282,7 +282,7 @@ Each capability must include:
 - `run`: Function that executes the capability, receiving validated args and action context
 
 ```typescript
-import { Agent } from '@openserv-labs/sdk'
+import { Agent } from '@vortexa-labs/sdk'
 import { z } from 'zod'
 
 const agent = new Agent({
@@ -535,7 +535,7 @@ const response = await agent.callIntegration({
 })
 ```
 
-Allows agents to interact with external services and APIs that are integrated with OpenServ. This method provides a secure way to make API calls to configured integrations within a workspace. Authentication is handled securely and automatically through the OpenServ platform. This is primarily useful for calling external APIs in a deterministic way.
+Allows agents to interact with external services and APIs that are integrated with Vortexa. This method provides a secure way to make API calls to configured integrations within a workspace. Authentication is handled securely and automatically through the Vortexa platform. This is primarily useful for calling external APIs in a deterministic way.
 
 **Parameters:**
 
@@ -652,14 +652,14 @@ class DataAnalysisAgent extends Agent {
 
 ## Examples
 
-Check out our [examples directory](https://github.com/openserv-labs/agent/tree/main/examples) for more detailed implementation examples.
+Check out our [examples directory](https://github.com/vortexa-labs/agent/tree/main/examples) for more detailed implementation examples.
 
 ## License
 
 ```
 MIT License
 
-Copyright (c) 2024 OpenServ Labs
+Copyright (c) 2024 Vortexa Labs
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -682,4 +682,4 @@ SOFTWARE.
 
 ---
 
-Built with ❤️ by [OpenServ Labs](https://openserv.ai)
+Built with ❤️ by [Vortexa Labs](https://vortexa.xyz)
