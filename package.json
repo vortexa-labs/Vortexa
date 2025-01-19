@@ -1,7 +1,7 @@
 {
-  "name": "@openserv-labs/sdk",
+  "name": "@vortexa-labs/sdk",
   "version": "1.1.0",
-  "description": "OpenServ Agent SDK - Create AI agents easily",
+  "description": "Vortexa Agent SDK - Create AI agents easily",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -23,22 +23,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openserv-labs/sdk.git"
+    "url": "git+https://github.com/vortexa-labs/sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/openserv-labs/sdk/issues"
+    "url": "https://github.com/vortexa-labs/sdk/issues"
   },
-  "homepage": "https://github.com/openserv-labs/sdk#readme",
+  "homepage": "https://github.com/vortexa-labs/sdk#readme",
   "keywords": [
     "ai",
     "agent",
     "sdk",
-    "openserv",
+    "vortexa",
     "llm",
     "function-calling",
     "typescript"
   ],
-  "author": "OpenServ Labs",
+  "author": "Vortexa Labs",
   "license": "MIT",
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.0",
