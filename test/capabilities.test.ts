@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { Agent, Capability } from '../src'
 
 describe('Agent Capabilities', () => {
-  const mockApiKey = 'test-openserv-key'
+  const mockApiKey = 'test-vortexa-key'
 
   test('should execute a capability function and return the expected output', async () => {
     const agent = new Agent({
