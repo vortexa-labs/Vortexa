@@ -355,7 +355,7 @@ describe('Action Schemas', () => {
   test('should validate agent kind', () => {
     assert.strictEqual(agentKind.parse('external'), 'external')
     assert.strictEqual(agentKind.parse('eliza'), 'eliza')
-    assert.strictEqual(agentKind.parse('openserv'), 'openserv')
+    assert.strictEqual(agentKind.parse('vortexa'), 'vortexa')
     assert.throws(() => agentKind.parse('invalid'))
   })
 
